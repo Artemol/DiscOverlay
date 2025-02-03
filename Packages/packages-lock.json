@@ -200,6 +200,24 @@
       },
       "url": "https://upm-pkgs.voltstro.dev"
     },
+    "dev.voltstro.unitywebbrowser.engine.cef": {
+      "version": "2.2.5-130.1.16",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {
+        "dev.voltstro.unitywebbrowser": "2.2.5"
+      },
+      "url": "https://upm-pkgs.voltstro.dev"
+    },
+    "dev.voltstro.unitywebbrowser.engine.cef.win.x64": {
+      "version": "2.2.5-130.1.16",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {
+        "dev.voltstro.unitywebbrowser.engine.cef": "2.2.5-130.1.16"
+      },
+      "url": "https://upm-pkgs.voltstro.dev"
+    },
     "org.nuget.voltrpc": {
       "version": "3.2.1",
       "depth": 1,

@@ -9,6 +9,8 @@
     "com.unity.visualscripting": "1.9.2",
     "com.valvesoftware.unity.openvr": "file:../Assets/SteamVR/OpenVRUnityXRPackage/Editor/com.valvesoftware.unity.openvr-1.2.1.tgz",
     "dev.voltstro.unitywebbrowser": "2.2.5",
+    "dev.voltstro.unitywebbrowser.engine.cef": "2.2.5-130.1.16",
+    "dev.voltstro.unitywebbrowser.engine.cef.win.x64": "2.2.5-130.1.16",
     "com.unity.modules.ai": "1.0.0",
     "com.unity.modules.androidjni": "1.0.0",
     "com.unity.modules.animation": "1.0.0",

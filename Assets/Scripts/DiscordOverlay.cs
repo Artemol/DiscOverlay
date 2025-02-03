@@ -8,7 +8,8 @@ public class DiscordOverlay : MonoBehaviour
     public RenderTexture renderTexture;
     private ulong overlayHandle = OpenVR.k_ulOverlayHandleInvalid;
 
-    [Range(0, 0.5f)] public float size = 0.5f;
+    [SerializeField] private bool isDebuggingPosition = false;
+    [Range(0, 3f)] public float size = 0.5f;
     [Range(-2f, 2f)] public float x;
     [Range(-2f, 2f)] public float y;
     [Range(-2f, 2f)] public float z;
@@ -21,19 +22,8 @@ public class DiscordOverlay : MonoBehaviour
         InitOpenVR();
         overlayHandle = CreateOverlay("DiscordOverlayKey", "DiscordOverlay");
 
-        var bounds = new VRTextureBounds_t
-        {
-            uMin = 0,
-            uMax = 1,
-            vMin = 1,
-            vMax = 0
-        };
-        var error = OpenVR.Overlay.SetOverlayTextureBounds(overlayHandle, ref bounds);
-        if (error != EVROverlayError.None)
-        {
-            throw new Exception("Failed to set overlay texture bounds: " + error);
-        }
-        
+        FlipOverlayVertical(overlayHandle);
+
         var position = new Vector3(x, y, z);
         var rotation = Quaternion.Euler(rotationX, rotationY, rotationZ);
         SetOverlayTransformRelative(overlayHandle, OpenVR.k_unTrackedDeviceIndex_Hmd, position, rotation);
@@ -43,23 +33,17 @@ public class DiscordOverlay : MonoBehaviour
         ShowOverlay(overlayHandle);
     }
 
+
     private void Update()
     {
-        if (!renderTexture.IsCreated()) return;
-        var nativeTexturePtr = renderTexture.GetNativeTexturePtr();
-
-        var texture = new Texture_t
+        if (isDebuggingPosition)
         {
-            eType = ETextureType.DirectX,
-            eColorSpace = EColorSpace.Auto,
-            handle = nativeTexturePtr
-        };
-
-        var error = OpenVR.Overlay.SetOverlayTexture(overlayHandle, ref texture);
-        if (error != EVROverlayError.None)
-        {
-            throw new Exception("Failed to set overlay texture: " + error);
+            var position = new Vector3(x, y, z);
+            var rotation = Quaternion.Euler(rotationX, rotationY, rotationZ);
+            SetOverlayTransformRelative(overlayHandle, OpenVR.k_unTrackedDeviceIndex_Hmd, position, rotation);
         }
+        
+        SetOverlayRenderTexture(overlayHandle, renderTexture);
     }
 
     private void OnApplicationQuit()
@@ -164,6 +148,41 @@ public class DiscordOverlay : MonoBehaviour
         if (error != EVROverlayError.None)
         {
             throw new Exception("Failed to set overlay transform: " + error);
+        }
+    }
+
+    private void FlipOverlayVertical(ulong handle)
+    {
+        var bounds = new VRTextureBounds_t
+        {
+            uMin = 0,
+            uMax = 1,
+            vMin = 1,
+            vMax = 0
+        };
+        var error = OpenVR.Overlay.SetOverlayTextureBounds(handle, ref bounds);
+        if (error != EVROverlayError.None)
+        {
+            throw new Exception("Failed to set overlay texture bounds: " + error);
+        }
+    }
+
+    private void SetOverlayRenderTexture(ulong handle, RenderTexture renderTexture)
+    {
+        if (!renderTexture.IsCreated()) return;
+        var nativeTexturePtr = renderTexture.GetNativeTexturePtr();
+
+        var texture = new Texture_t
+        {
+            eType = ETextureType.DirectX,
+            eColorSpace = EColorSpace.Auto,
+            handle = nativeTexturePtr
+        };
+
+        var error = OpenVR.Overlay.SetOverlayTexture(handle, ref texture);
+        if (error != EVROverlayError.None)
+        {
+            throw new Exception("Failed to set overlay texture: " + error);
         }
     }
 }
