@@ -4,6 +4,8 @@ using System;
 
 public class DiscordOverlay : MonoBehaviour
 {
+    public Camera camera;
+    public RenderTexture renderTexture;
     private ulong overlayHandle = OpenVR.k_ulOverlayHandleInvalid;
 
     [Range(0, 0.5f)] public float size = 0.5f;
@@ -13,23 +15,51 @@ public class DiscordOverlay : MonoBehaviour
     [Range(0, 360)] public float rotationX;
     [Range(0, 360)] public float rotationY;
     [Range(0, 360)] public float rotationZ;
-    
+
     private void Start()
     {
         InitOpenVR();
-
         overlayHandle = CreateOverlay("DiscordOverlayKey", "DiscordOverlay");
+
+        var bounds = new VRTextureBounds_t
+        {
+            uMin = 0,
+            uMax = 1,
+            vMin = 1,
+            vMax = 0
+        };
+        var error = OpenVR.Overlay.SetOverlayTextureBounds(overlayHandle, ref bounds);
+        if (error != EVROverlayError.None)
+        {
+            throw new Exception("Failed to set overlay texture bounds: " + error);
+        }
         
         var position = new Vector3(x, y, z);
         var rotation = Quaternion.Euler(rotationX, rotationY, rotationZ);
         SetOverlayTransformRelative(overlayHandle, OpenVR.k_unTrackedDeviceIndex_Hmd, position, rotation);
 
-        var filePath = Application.streamingAssetsPath + "/test.jpg";
-        SetOverlayFromFile(overlayHandle, filePath);
-
         SetOverlaySize(overlayHandle, size);
 
         ShowOverlay(overlayHandle);
+    }
+
+    private void Update()
+    {
+        if (!renderTexture.IsCreated()) return;
+        var nativeTexturePtr = renderTexture.GetNativeTexturePtr();
+
+        var texture = new Texture_t
+        {
+            eType = ETextureType.DirectX,
+            eColorSpace = EColorSpace.Auto,
+            handle = nativeTexturePtr
+        };
+
+        var error = OpenVR.Overlay.SetOverlayTexture(overlayHandle, ref texture);
+        if (error != EVROverlayError.None)
+        {
+            throw new Exception("Failed to set overlay texture: " + error);
+        }
     }
 
     private void OnApplicationQuit()
@@ -86,7 +116,7 @@ public class DiscordOverlay : MonoBehaviour
             }
         }
     }
-    
+
     private void SetOverlayFromFile(ulong handle, string path)
     {
         var error = OpenVR.Overlay.SetOverlayFromFile(handle, path);
@@ -95,7 +125,7 @@ public class DiscordOverlay : MonoBehaviour
             throw new Exception("Failed to set overlay from file: " + error);
         }
     }
-    
+
     private void ShowOverlay(ulong handle)
     {
         var error = OpenVR.Overlay.ShowOverlay(handle);
@@ -104,7 +134,7 @@ public class DiscordOverlay : MonoBehaviour
             throw new Exception("Failed to show overlay: " + error);
         }
     }
-    
+
     private void SetOverlaySize(ulong handle, float size)
     {
         var error = OpenVR.Overlay.SetOverlayWidthInMeters(handle, size);
@@ -125,7 +155,7 @@ public class DiscordOverlay : MonoBehaviour
             throw new Exception("Failed to set overlay transform: " + error);
         }
     }
-    
+
     private void SetOverlayTransformRelative(ulong handle, uint deviceIndex, Vector3 position, Quaternion rotation)
     {
         var rigidTransform = new SteamVR_Utils.RigidTransform(position, rotation);
