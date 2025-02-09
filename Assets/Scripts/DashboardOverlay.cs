@@ -21,7 +21,7 @@ public class DashboardOverlay : MonoBehaviour
         
         (dashboardHandle, thumbnailHandle) = Overlay.CreateDashboardOverlay("DiscordDashboardKey", "Discord Overlay Setting");
         
-        var filePath = Application.streamingAssetsPath + "/test.jpg";
+        var filePath = Application.streamingAssetsPath + "/icon.png";
         Overlay.SetOverlayFromFile(thumbnailHandle, filePath);
         
         Overlay.FlipOverlayVertical(dashboardHandle);
