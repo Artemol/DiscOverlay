@@ -29,6 +29,7 @@ public class Configurator : MonoBehaviour
 
     [SerializeField] private BrowserManager browserManager;
     [SerializeField] private GameObject browserObject;
+    [SerializeField] private MainScreenManager mainScreenManager;
 
     private void OnEnable()
     {
@@ -81,9 +82,8 @@ public class Configurator : MonoBehaviour
         Apply();
         string json = JsonUtility.ToJson(settingsAsset, true);
         Configurator.SaveToJson("settings.json", json);
-        // discordOverlay.SetPositionAndSize();
-        // SetBrowserUrl();
 
+        mainScreenManager.SetText();
         logText.SetText("Saved to " + GetFullPath("settings.json"));
     }
 
@@ -121,11 +121,7 @@ public class Configurator : MonoBehaviour
 
     private static string GetFullPath(string dataPath)
     {
-#if !UNITY_EDITOR
         return Application.persistentDataPath + "/" + dataPath;
-#else
-        return Application.dataPath + "/" + dataPath;
-#endif
     }
 
     private static bool SaveToJson(string dataPath, string json)
