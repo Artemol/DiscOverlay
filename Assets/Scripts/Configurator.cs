@@ -173,11 +173,11 @@ public class Configurator : MonoBehaviour
                 return false;
             }
 
-            if (settingsAsset.serverId.Length != 19 || settingsAsset.channelId.Length != 19)
+            /*if (settingsAsset.serverId.Length != 19 || settingsAsset.channelId.Length != 19)
             {
                 logText.SetText("serverId and channelId must be 19 characters long");
                 return false;
-            }
+            }*/
 
             if (!long.TryParse(settingsAsset.serverId, out _) || !long.TryParse(settingsAsset.channelId, out _))
             {
